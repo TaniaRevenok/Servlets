@@ -9,7 +9,7 @@ import java.io.IOException;
 
 
 @WebServlet(urlPatterns = "/findDevForm")
-public class finDeveloperByName extends HttpServlet {
+public class FindDevByNameFormServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
