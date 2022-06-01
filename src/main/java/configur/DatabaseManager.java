@@ -1,7 +1,9 @@
 package configur;
-import org.hibernate.Session;
-public interface DatabaseManager {
+import java.sql.SQLException;
+import java.sql.Connection;
 
-    Session getSession();
+public interface DatabaseManager {
+ Connection getConnection() throws SQLException;
+
 }
 
