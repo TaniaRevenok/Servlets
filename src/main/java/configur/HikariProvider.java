@@ -1,14 +1,15 @@
-package config;
+package configur;
 
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.HikariConfig;
+import configur.DataBaseManagerConnector;
+
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.DriverManager;
 
 public class HikariProvider implements DataBaseManagerConnector {
 
-   private final HikariDataSource dataSource;
+    private final HikariDataSource dataSource;
 
     public HikariProvider(String hostname, int port, String database, String username, String password, String jdbcDriver) {
         HikariConfig config = new HikariConfig();

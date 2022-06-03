@@ -1,6 +1,5 @@
 package model.dao;
 
-import java.util.Objects;
 
 public class SkillsDao {
 
@@ -25,6 +24,14 @@ public class SkillsDao {
         this.id = id;
     }
 
+    public String getSyntax() {
+        return syntax;
+    }
+
+    public void setSyntax(String syntax) {
+        this.syntax = syntax;
+    }
+
     public String getRank() {
         return rank;
     }
@@ -33,13 +40,7 @@ public class SkillsDao {
         this.rank = rank;
     }
 
-    public String getSyntax() {
-        return syntax;
-    }
 
-    public void setSyntax(String syntax) {
-        this.syntax = syntax;
-    }
 
 
 }

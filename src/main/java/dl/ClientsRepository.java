@@ -1,6 +1,5 @@
 package dl;
-
-import config.DataBaseManagerConnector;
+import configur.DataBaseManagerConnector;
 import model.dao.ClientsDao;
 
 
@@ -10,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class ClientsRepository implements Repository<ClientsDao> {
 
@@ -23,6 +21,7 @@ public class ClientsRepository implements Repository<ClientsDao> {
     private static final String FIND_BY_ID = "SELECT * FROM clients c WHERE c.id = ?";
     private static final String INSERT = "INSERT INTO clients (name, country, category) VALUES (?, ?, ?)";
     private static final String INSERT_WITH_ID = "INSERT INTO clients (id, name, country, category) VALUES (?, ?, ?, ?)";
+    private static final String SELECT_BY_NAME = "SELECT * FROM clients c WHERE c.name = ?";
 
 
     public ClientsRepository(DataBaseManagerConnector connector) {
@@ -55,17 +54,21 @@ public class ClientsRepository implements Repository<ClientsDao> {
     }
 
     @Override
-    public void save(ClientsDao entity) {
+    public Integer save(ClientsDao entity) {
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT)) {
             statement.setString(1, entity.getName());
             statement.setString(2, entity.getCountry());
             statement.setString(3, entity.getCategory());
             statement.execute();
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if(generatedKeys.next()){
+                return generatedKeys.getInt(1);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        return null;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class ClientsRepository implements Repository<ClientsDao> {
             statement.setString(4, entity.getCategory());
             statement.execute();
         } catch (SQLException e) {
-            System.out.println("!!!The ID already exists!!!");
+            e.printStackTrace();
         }
     }
 
@@ -138,5 +141,17 @@ public class ClientsRepository implements Repository<ClientsDao> {
             e.printStackTrace();
         }
         return clientsList;
+    }
+
+    public ClientsDao findByName(String name) {
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_BY_NAME)) {
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+            return mapToClientsDao(resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -1,6 +1,6 @@
 package dl;
 
-import config.DataBaseManagerConnector;
+import configur.DataBaseManagerConnector;
 import model.dao.SkillsDao;
 
 import java.sql.Connection;
@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class SkillsRepository implements Repository<SkillsDao> {
 
@@ -41,7 +40,7 @@ public class SkillsRepository implements Repository<SkillsDao> {
 
 
     @Override
-    public void save(SkillsDao entity) {
+    public Integer save(SkillsDao entity) {
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT)) {
             statement.setString(1, entity.getRank());
@@ -51,6 +50,7 @@ public class SkillsRepository implements Repository<SkillsDao> {
             e.printStackTrace();
         }
 
+        return null;
     }
 
     @Override

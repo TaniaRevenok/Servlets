@@ -1,6 +1,7 @@
 package dl;
 
-import config.DataBaseManagerConnector;
+
+import configur.DataBaseManagerConnector;
 import model.dao.ProjectsDao;
 
 import java.sql.Connection;
@@ -9,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class ProjectsRepository implements Repository<ProjectsDao> {
 
@@ -22,7 +22,7 @@ public class ProjectsRepository implements Repository<ProjectsDao> {
     private static final String FIND_BY_ID = "SELECT * FROM projects p WHERE p.id = ?";
     private static final String INSERT = "INSERT INTO projects (project_name, start_date, cost) VALUES (?, ?, ?)";
     private static final String INSERT_WITH_ID = "INSERT INTO projects (id, project_name, start_date, cost) VALUES (?, ?, ?, ?)";
-
+    private static final String FIND_BY_NAME = "SELECT id, project_name, start_date, cost FROM projects WHERE project_name = ?";
     public ProjectsRepository(DataBaseManagerConnector connector) {
         this.connector = connector;
     }
@@ -53,16 +53,21 @@ public class ProjectsRepository implements Repository<ProjectsDao> {
     }
 
     @Override
-    public void save(ProjectsDao entity) {
+    public Integer save(ProjectsDao entity) {
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT)) {
             statement.setString(1, entity.getProjectName());
             statement.setDate(2, entity.getStartDate());
             statement.setDouble(3, entity.getCost());
             statement.execute();
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if(generatedKeys.next()){
+                return generatedKeys.getInt(1);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     @Override
@@ -74,7 +79,7 @@ public class ProjectsRepository implements Repository<ProjectsDao> {
             statement.setDouble(3, entity.getCost());
             statement.execute();
         } catch (SQLException e) {
-            System.out.println("!!!The ID already exists!!!");
+            e.printStackTrace();
         }
 
     }
@@ -124,6 +129,18 @@ public class ProjectsRepository implements Repository<ProjectsDao> {
             e.printStackTrace();
         }
         return projects;
+    }
+
+    public ProjectsDao findByName(String name) {
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_NAME)) {
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+            return mapToProjectsDao(resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

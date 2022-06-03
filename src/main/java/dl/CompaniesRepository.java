@@ -1,7 +1,6 @@
 package dl;
 
-import config.DataBaseManagerConnector;
-import config.HikariProvider;
+import configur.DataBaseManagerConnector;
 import model.dao.CompaniesDao;
 
 import java.sql.Connection;
@@ -10,11 +9,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class CompaniesRepository implements Repository<CompaniesDao> {
 
-    private final HikariProvider connector;
+    private final DataBaseManagerConnector connector;
 
     private static final String SELECT_ALL_COMPANIES = "SELECT * FROM companies";
     private static final String UPDATE_COMPANY = "UPDATE companies SET company_name = ?, city = ? WHERE id = ?";
@@ -22,8 +20,9 @@ public class CompaniesRepository implements Repository<CompaniesDao> {
     private static final String FIND_BY_ID = "SELECT * FROM companies c WHERE c.id = ?";
     private static final String INSERT = "INSERT INTO companies (company_name, city) VALUES (?, ?)";
     private static final String INSERT_WITH_ID = "INSERT INTO companies (id, company_name, city) VALUES (?, ?, ?)";
+    private static final String FIND_BY_NAME = "SELECT * FROM companies c WHERE c.company_name = ?";
 
-    public CompaniesRepository(HikariProvider connector) {
+    public CompaniesRepository(DataBaseManagerConnector connector) {
         this.connector = connector;
     }
 
@@ -52,16 +51,20 @@ public class CompaniesRepository implements Repository<CompaniesDao> {
     }
 
     @Override
-    public void save(CompaniesDao entity) {
+    public Integer save(CompaniesDao entity) {
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT)) {
             statement.setString(1, entity.getCompanyName());
             statement.setString(2, entity.getCity());
             statement.execute();
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if(generatedKeys.next()){
+                return generatedKeys.getInt(1);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        return null;
     }
 
     @Override
@@ -73,7 +76,7 @@ public class CompaniesRepository implements Repository<CompaniesDao> {
             statement.setString(3, entity.getCity());
             statement.execute();
         } catch (SQLException e) {
-            System.out.println("!!!The ID already exists!!!");
+            e.printStackTrace();
         }
     }
 
@@ -84,6 +87,7 @@ public class CompaniesRepository implements Repository<CompaniesDao> {
              PreparedStatement statement = connection.prepareStatement(UPDATE_COMPANY)) {
             statement.setString(1, entity.getCompanyName());
             statement.setString(2, entity.getCity());
+            statement.setInt(3, entity.getId());
             columnsUpdated = statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -106,7 +110,7 @@ public class CompaniesRepository implements Repository<CompaniesDao> {
     public List<CompaniesDao> selectAll() {
         List<CompaniesDao> coDaoList = new ArrayList<>();
         try(Connection connection = connector.getConnection();
-        PreparedStatement statement = connection.prepareStatement(SELECT_ALL_COMPANIES)) {
+            PreparedStatement statement = connection.prepareStatement(SELECT_ALL_COMPANIES)) {
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
                 CompaniesDao coDao = new CompaniesDao();
@@ -119,5 +123,17 @@ public class CompaniesRepository implements Repository<CompaniesDao> {
             e.printStackTrace();
         }
         return coDaoList;
+    }
+    public CompaniesDao findByName(String name) {
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_NAME)) {
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+            return mapToCompaniesDao(resultSet);
+        } catch (
+                SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

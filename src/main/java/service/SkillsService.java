@@ -17,9 +17,10 @@ public class SkillsService {
         this.converter = converter;
     }
 
-    public void save(SkillsDto skills) {
+    public void save(SkillsDto skill) {
+        Integer skillId = repository.save(converter.convert(skill));
+        skill.setId(skillId);
 
-        repository.save(converter.convert(skills));
     }
 
     public SkillsDto findById(Integer id) {
@@ -34,5 +35,9 @@ public class SkillsService {
 
     public List<SkillsDto> findAll() {
         return repository.selectAll().stream().map(converter::convert).collect(Collectors.toList());
+    }
+
+    public void delete(Integer id){
+        repository.delete(id);
     }
 }

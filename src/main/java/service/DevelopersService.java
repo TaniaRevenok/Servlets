@@ -1,9 +1,7 @@
 package service;
 
 import dl.DevelopersRepository;
-import dl.Repository;
 import model.converter.DevelopersConverter;
-import model.dao.DevelopersDao;
 import model.dto.DevelopersDto;
 
 import java.util.List;
@@ -19,8 +17,9 @@ public class DevelopersService {
         this.converter = converter;
     }
 
-    public void save(DevelopersDto developers) {
-        repository.save(converter.convert(developers));
+    public void save(DevelopersDto developer) {
+        Integer devId = repository.save(converter.convert(developer));
+        developer.setId(devId);
     }
 
     public DevelopersDto findById(Integer id) {
@@ -29,17 +28,24 @@ public class DevelopersService {
     }
 
     public DevelopersDto findByName(String name) {
-    DevelopersDto dev = converter.convert(repository.findByName(name));
+        DevelopersDto dev = converter.convert(repository.findByName(name));
         return dev;
     }
 
 
 
-    public void update(DevelopersDto developers) {
-        repository.update(converter.convert(developers));
+    public void update(DevelopersDto developer) {
+        repository.update(converter.convert(developer));
     }
 
     public List<DevelopersDto> findAll() {
-        return repository.selectAll().stream().map(converter::convert).collect(Collectors.toList());
+        return repository.selectAll()
+                .stream()
+                .map(converter::convert)
+                .collect(Collectors.toList());
+    }
+
+    public void delete(Integer id){
+        repository.delete(id);
     }
 }

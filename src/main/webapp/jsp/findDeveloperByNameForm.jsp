@@ -6,31 +6,19 @@
 
 <head>
     <title>Developers Page</title>
-    <c:import url="${path}header.jsp" />
+    <c:import url="${path}headers&footer/header.jsp" />
 </head>
 
 <body>
 
     <header>
-        <div class="container">
-            <img src="${path}/img/logo.png" alt="logo" class="logo">
-            <nav class="devstabs">
-                <ul>
-                    <li><a href="/homePage.html">Home</a></li>
-                    <li><a href="/findDeveloperByIdForm">Find Developer by Id</a></li>
-                    <li><a href="/findDeveloperByNameForm.html">Find Developer by Name</a></li>
-                    <li><a href="/addDeveloperForm">Add Developer to DB</a></li>
-                    <li><a href="/updateDeveloperForm">Update Developer Info</a></li>
-                    <li><a href="/removeDeveloperForm">Remove Developer from DB</a></li>
-                    <li><a href="/showAllDeveloperInfo">Show All Developers Info</a></li>
-                </ul>
-        </div>
+        <c:import url="${path}headers&footer/devsHeader.jsp" />
     </header>
 
     <form action="/findDeveloperByName">
         <label for="devsName">Developer Name</label>
-        <input type="text" name="devsName" id="developerName" placeholder="Enter Dev's Name" /><br>
-        <input type="submit" value="Submit" />
+        <input class="input" type="text" name="devsName" required placeholder="Enter Dev's Name" /><br>
+        <input class="sub" type="submit" value="Submit" />
     </form>
 
 
@@ -65,7 +53,7 @@
     </form> --%>
 
 
-<c:import url="${path}bodyFooter.jsp" />
+<c:import url="${path}headers&footer/bodyFooter.jsp" />
 </body>
 
 </html>
